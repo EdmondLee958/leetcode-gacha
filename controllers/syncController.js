@@ -13,6 +13,20 @@ export async function syncLeetcode(req, res) {
       });
     }
 
+    const now = new Date();
+
+    if (user.lastSync) {
+        const timeSinceLastSync = now - user.lastSync;
+        const oneMinute = 60 * 1000;
+
+        if (timeSinceLastSync < oneMinute) {
+            return res.status(429).json({
+         message: "Please wait before syncing again",
+         secondsRemaining: Math.ceil((oneMinute - timeSinceLastSync) / 1000)
+    });
+  }
+}
+
     const currentStats = await getSolvedStats(user.leetcodeUsername);
 
     const easyDelta = Math.max(0, currentStats.easy - user.easySolved);
@@ -26,16 +40,16 @@ export async function syncLeetcode(req, res) {
       mediumDelta * 3 +
       hardDelta * 7;
 
-    if (totalDelta > 0) {
-      user.easySolved = currentStats.easy;
-      user.mediumSolved = currentStats.medium;
-      user.hardSolved = currentStats.hard;
-      user.lastSolvedCount = currentStats.total;
-      user.rolls += rollsEarned;
-      user.lastSync = new Date();
+if (totalDelta > 0) {
+  user.easySolved = currentStats.easy;
+  user.mediumSolved = currentStats.medium;
+  user.hardSolved = currentStats.hard;
+  user.lastSolvedCount = currentStats.total;
+  user.rolls += rollsEarned;
+}
 
-      await user.save();
-    }
+user.lastSync = new Date();
+await user.save();
 
     res.json({
       currentStats,
