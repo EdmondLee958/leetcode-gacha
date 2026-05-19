@@ -3,11 +3,31 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
+import {
+ signup,
+ login
+}
+from "../controllers/authController.js";
+
+router.post(
+    "/signup",
+    signup
+);
+
+router.post(
+    "/login",
+    login
+);
+
 import { syncLeetcode }
 from "../controllers/syncController.js";
 
+import { auth }
+from "../middleware/authMiddleware.js";
+
 router.post(
     "/sync",
+    auth,
     syncLeetcode
 );
 
@@ -16,7 +36,7 @@ import { getSolvedStats } from "../services/leetcodeService.js";
 router.get("/leetcode-test", async (req,res)=>{
 
     const solved =
-      await getSolvedCount(
+      await getSolvedStats(
         "edlee1"
       );
 

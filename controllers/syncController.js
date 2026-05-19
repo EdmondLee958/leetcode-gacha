@@ -3,9 +3,10 @@ import { getSolvedStats } from "../services/leetcodeService.js";
 
 export async function syncLeetcode(req, res) {
   try {
-    const { email } = req.body;
-
-    const user = await User.findOne({ email });
+    const user =
+      await User.findById(
+        req.user.userId
+ );
 
     if (!user) {
       return res.status(404).json({
