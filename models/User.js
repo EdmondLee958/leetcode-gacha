@@ -22,6 +22,21 @@ const userSchema = new mongoose.Schema({
     default: 0
   },
 
+  easySolved: {
+  type: Number,
+  default: 0
+},
+
+mediumSolved: {
+  type: Number,
+  default: 0
+},
+
+hardSolved: {
+  type: Number,
+  default: 0
+},
+
   lastSync: {
     type: Date
   }

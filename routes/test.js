@@ -11,7 +11,7 @@ router.post(
     syncLeetcode
 );
 
-import { getSolvedCount } from "../services/leetcodeService.js";
+import { getSolvedStats } from "../services/leetcodeService.js";
 
 router.get("/leetcode-test", async (req,res)=>{
 
