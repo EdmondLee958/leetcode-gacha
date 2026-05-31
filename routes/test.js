@@ -50,6 +50,10 @@ import { setLineup } from "../controllers/lineupController.js";
 
 router.post("/lineup", auth, setLineup);
 
+import { startBattle } from "../controllers/battleController.js";
+
+router.post("/battle", auth, startBattle);
+
 import { getSolvedStats } from "../services/leetcodeService.js";
 
 router.get("/leetcode-test", async (req,res)=>{
