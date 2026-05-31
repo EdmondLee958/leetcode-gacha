@@ -31,6 +31,17 @@ router.post(
     syncLeetcode
 );
 
+import {
+  rollCharacter
+}
+from "../controllers/rollController.js";
+
+router.post(
+  "/roll",
+  auth,
+  rollCharacter
+);
+
 import { getSolvedStats } from "../services/leetcodeService.js";
 
 router.get("/leetcode-test", async (req,res)=>{

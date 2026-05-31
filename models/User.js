@@ -42,6 +42,25 @@ hardSolved: {
   default: 0
 },
 
+characters: {
+  type: [
+    {
+      name: String,
+      rarity: String,
+      classType: String,
+      level: {
+        type: Number,
+        default: 1
+      },
+      obtainedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ],
+  default: []
+},
+
   lastSync: {
     type: Date
   }
