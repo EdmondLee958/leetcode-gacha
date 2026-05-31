@@ -46,6 +46,10 @@ import { getInventory } from "../controllers/inventoryController.js";
 
 router.get("/inventory", auth, getInventory);
 
+import { setLineup } from "../controllers/lineupController.js";
+
+router.post("/lineup", auth, setLineup);
+
 import { getSolvedStats } from "../services/leetcodeService.js";
 
 router.get("/leetcode-test", async (req,res)=>{

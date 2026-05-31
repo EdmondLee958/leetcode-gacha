@@ -61,6 +61,11 @@ characters: {
   default: []
 },
 
+lineup: {
+  type: [String],
+  default: []
+},
+
   lastSync: {
     type: Date
   }
