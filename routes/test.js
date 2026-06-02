@@ -54,6 +54,16 @@ import { startBattle } from "../controllers/battleController.js";
 
 router.post("/battle", auth, startBattle);
 
+import {
+  startRun,
+  runBattle,
+  claimReward
+} from "../controllers/runController.js";
+
+router.post("/runs/start", auth, startRun);
+router.post("/runs/battle", auth, runBattle);
+router.post("/runs/reward", auth, claimReward);
+
 import { getSolvedStats } from "../services/leetcodeService.js";
 
 router.get("/leetcode-test", async (req,res)=>{
