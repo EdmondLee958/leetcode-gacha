@@ -104,7 +104,21 @@ export async function runBattle(req, res) {
       side: "hero"
     }));
 
-    const enemies = [
+const isBossFight = run.encounterNumber % 5 === 0;
+
+const enemies = isBossFight
+  ? [
+      {
+        name: "First Boss",
+        hp: 105,
+        maxHp: 105,
+        atkMin: 8,
+        atkMax: 10,
+        spd: 11,
+        side: "enemy"
+      }
+    ]
+  : [
       {
         name: "Goblin",
         hp: randomAtk(32, 36),
@@ -179,6 +193,7 @@ export async function runBattle(req, res) {
 
     res.json({
       result: heroesWon ? "win" : "loss",
+      isBossFight,
       runStatus: run.status,
       encounterNumber: run.encounterNumber,
       score: run.score,
@@ -255,6 +270,80 @@ export async function claimReward(req, res) {
       rewardType,
       character,
       run
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+}
+
+export async function getCurrentRun(req, res) {
+  try {
+    const run = await Run.findOne({
+      userId: req.user.userId,
+      status: "active"
+    });
+
+    if (!run) {
+      return res.status(404).json({
+        message: "No active run found"
+      });
+    }
+
+    res.json({ run });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+}
+
+export async function endRun(req, res) {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+    const run = await Run.findOne({
+      userId: req.user.userId,
+      status: { $in: ["active", "failed"] }
+    });
+
+    if (!run) {
+      return res.status(404).json({
+        message: "No run found to end"
+      });
+    }
+
+    const deadCharacterIds = run.party
+      .filter(character => !character.alive)
+      .map(character => character.characterId);
+
+    user.characters = user.characters.filter(character =>
+      !deadCharacterIds.includes(character._id.toString())
+    );
+
+    user.lineup = user.lineup.filter(characterId =>
+      !deadCharacterIds.includes(characterId)
+    );
+
+    await user.save();
+
+    await Run.deleteOne({ _id: run._id });
+
+    res.json({
+      message: "Run ended",
+      score: run.score,
+      deadCharacterIds,
+      remainingCharacters: user.characters,
+      lineup: user.lineup
     });
 
   } catch (error) {
