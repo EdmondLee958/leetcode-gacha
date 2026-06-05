@@ -46,9 +46,13 @@ import { getInventory } from "../controllers/inventoryController.js";
 
 router.get("/inventory", auth, getInventory);
 
-import { setLineup } from "../controllers/lineupController.js";
+import {
+  setLineup,
+  getLineup
+} from "../controllers/lineupController.js";
 
 router.post("/lineup", auth, setLineup);
+router.get("/lineup", auth, getLineup);
 
 import { startBattle } from "../controllers/battleController.js";
 

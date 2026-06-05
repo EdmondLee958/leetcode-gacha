@@ -281,10 +281,9 @@ export async function claimReward(req, res) {
 
 export async function getCurrentRun(req, res) {
   try {
-    const run = await Run.findOne({
-      userId: req.user.userId,
-      status: "active"
-    });
+const run = await Run.findOne({
+  userId: req.user.userId
+}).sort({ createdAt: -1 });
 
     if (!run) {
       return res.status(404).json({

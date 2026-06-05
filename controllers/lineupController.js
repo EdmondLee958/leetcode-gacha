@@ -47,3 +47,28 @@ export async function setLineup(req, res) {
     });
   }
 }
+
+export async function getLineup(req, res) {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+    const lineupCharacters = user.lineup.map(id =>
+      user.characters.id(id)
+    );
+
+    res.json({
+      lineup: lineupCharacters
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+}
