@@ -61,6 +61,11 @@ const runSchema = new mongoose.Schema({
     default: false
   },
 
+  rewardClaims: {
+  type: [String],
+  default: []
+},
+
   phase: {
     type: String,
     enum: ["battle", "reward", "ended"],

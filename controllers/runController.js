@@ -193,6 +193,7 @@ function checkBattleEnd(run) {
     run.encounterNumber += 1;
     run.pendingReward = true;
     run.phase = "reward";
+    run.rewardClaims = [];
 
     if ((run.encounterNumber - 1) % 5 === 0) {
       run.enemyScalingLevel += 1;
@@ -332,7 +333,6 @@ export async function endRun(req, res) {
     }
 
     const deadCharacterIds = run.party
-      .filter(character => !character.alive)
       .map(character => character.characterId);
 
     user.characters = user.characters.filter(character =>
@@ -399,6 +399,12 @@ export async function claimReward(req, res) {
       });
     }
 
+    if (run.rewardClaims.includes(characterId)) {
+  return res.status(400).json({
+    message: "This character already claimed a reward"
+  });
+}
+
     if (rewardType === "heal") {
       const healAmount = Math.ceil(character.maxHp * 0.25);
       character.hp = Math.min(character.maxHp, character.hp + healAmount);
@@ -420,16 +426,28 @@ export async function claimReward(req, res) {
       });
     }
 
-    run.pendingReward = false;
-    run.phase = "battle";
+run.rewardClaims.push(characterId);
 
-    const enemies = createEnemiesForEncounter(
-      run.encounterNumber,
-      run.enemyScalingLevel
-    );
+const livingCharacters = run.party.filter(character => character.alive);
 
-    run.enemies = enemies;
-    run.battleLog.push(`Encounter ${run.encounterNumber} begins.`);
+if (run.rewardClaims.length >= livingCharacters.length) {
+  run.pendingReward = false;
+  run.phase = "battle";
+  run.rewardClaims = [];
+
+  const enemies = createEnemiesForEncounter(
+    run.encounterNumber,
+    run.enemyScalingLevel
+  );
+
+  run.enemies = enemies;
+  run.battleLog.push(`Encounter ${run.encounterNumber} begins.`);
+
+  await run.save();
+
+  run.turnOrder = buildTurnOrder(run.party, run.enemies);
+  run.currentTurnIndex = 0;
+}
 
     await run.save();
 
