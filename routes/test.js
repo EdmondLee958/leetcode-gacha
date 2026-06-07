@@ -60,16 +60,23 @@ router.post("/battle", auth, startBattle);
 
 import {
   startRun,
-  runBattle,
   claimReward,
   getCurrentRun,
-  endRun
-} from "../controllers/runController.js";
+  endRun,
+  runAction,
+  enemyAction
+}
+from "../controllers/runController.js";
 
 router.post("/runs/start", auth, startRun);
-router.post("/runs/battle", auth, runBattle);
+
+router.post("/runs/action", auth, runAction);
+router.post("/runs/enemy-action", auth, enemyAction);
+
 router.post("/runs/reward", auth, claimReward);
+
 router.get("/runs/current", auth, getCurrentRun);
+
 router.post("/runs/end", auth, endRun);
 
 import { getSolvedStats } from "../services/leetcodeService.js";

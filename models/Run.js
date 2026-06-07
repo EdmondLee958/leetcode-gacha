@@ -1,5 +1,38 @@
 import mongoose from "mongoose";
 
+const combatantSchema = new mongoose.Schema({
+  characterId: String,
+  name: String,
+  rarity: String,
+  classType: String,
+  side: String,
+  position: Number,
+
+  hp: Number,
+  maxHp: Number,
+  atkMin: Number,
+  atkMax: Number,
+  spd: Number,
+  critRate: Number,
+  critDamage: Number,
+
+  alive: {
+    type: Boolean,
+    default: true
+  },
+
+  buffs: {
+    type: [
+      {
+        stat: String,
+        value: Number,
+        duration: Number
+      }
+    ],
+    default: []
+  }
+}, { _id: true });
+
 const runSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -24,27 +57,39 @@ const runSchema = new mongoose.Schema({
   },
 
   pendingReward: {
-  type: Boolean,
-  default: false
-},
+    type: Boolean,
+    default: false
+  },
 
-  party: [
-    {
-      characterId: String,
-      name: String,
-      rarity: String,
-      classType: String,
-      hp: Number,
-      maxHp: Number,
-      atkMin: Number,
-      atkMax: Number,
-      spd: Number,
-      alive: {
-        type: Boolean,
-        default: true
-      }
-    }
-  ]
+  phase: {
+    type: String,
+    enum: ["battle", "reward", "ended"],
+    default: "battle"
+  },
+
+  party: [combatantSchema],
+
+  enemies: [combatantSchema],
+
+  turnOrder: {
+    type: [String],
+    default: []
+  },
+
+  currentTurnIndex: {
+    type: Number,
+    default: 0
+  },
+
+  battleLog: {
+    type: [String],
+    default: []
+  },
+
+  enemyScalingLevel: {
+    type: Number,
+    default: 0
+  }
 }, {
   timestamps: true
 });
