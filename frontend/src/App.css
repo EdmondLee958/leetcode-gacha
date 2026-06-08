@@ -61,7 +61,7 @@ button {
   background: rgba(17, 24, 39, 0.96);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 28px;
+  padding: 34px 28px 28px 28px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
@@ -74,11 +74,19 @@ button {
 
 .auth-card h1,
 .main-panel h1 {
-  margin: 12px 0;
+  font-size: clamp(42px, 5vw, 64px);
+  line-height: 1.1;
+  margin: 8px 0 12px;
 }
 
 .muted {
   color: var(--muted);
+}
+
+.section-header .muted,
+.auth-card .muted {
+  margin-top: 8px;
+  line-height: 1.5;
 }
 
 .tab-row {
@@ -213,8 +221,8 @@ select {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  align-items: center;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
 }
 
 .card-grid {
@@ -410,6 +418,7 @@ select {
   .unit-row {
     grid-template-columns: repeat(2, 1fr);
   }
+}
 
   .skill-detail-box {
   margin: 12px 0;
@@ -419,4 +428,107 @@ select {
   border-radius: 8px;
 }
 
+.sprite {
+  image-rendering: pixelated;
+  object-fit: contain;
+  display: block;
+  max-width: 100%;
+}
+
+.portrait-sprite {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 10px;
+}
+
+.battle-sprite {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 8px;
+}
+
+.character-card,
+.unit-card {
+  overflow: hidden;
+}
+
+.card-main {
+  text-align: center;
+}
+
+.unit-card {
+  text-align: center;
+}
+
+img.sprite {
+  width: 80px !important;
+  height: 80px !important;
+  object-fit: contain !important;
+}
+
+.unit-card.hit {
+  animation: shakeHit 0.4s ease;
+  border-color: var(--red);
+}
+
+.unit-card.boost {
+  animation: liftBoost 0.7s ease;
+  border-color: var(--green);
+}
+
+@keyframes shakeHit {
+  0% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 rgba(255, 95, 115, 0);
+  }
+
+  20% {
+    transform: translateX(-7px);
+    box-shadow: 0 0 18px rgba(255, 95, 115, 0.75);
+  }
+
+  40% {
+    transform: translateX(7px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+
+  100% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 rgba(255, 95, 115, 0);
+  }
+}
+
+@keyframes liftBoost {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 rgba(89, 214, 140, 0);
+  }
+
+  45% {
+    transform: translateY(-12px);
+    box-shadow: 0 0 22px rgba(89, 214, 140, 0.75);
+  }
+
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 rgba(89, 214, 140, 0);
+  }
+}
+
+.unit-card.hit {
+  animation: shakeHit 0.4s ease;
+  border-color: var(--red);
+}
+
+.unit-card.boost {
+  animation: liftBoost 0.7s ease;
+  border-color: var(--green);
+}
 }

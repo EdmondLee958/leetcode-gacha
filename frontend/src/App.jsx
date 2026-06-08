@@ -114,13 +114,25 @@ const CHARACTER_INFO = {
   }
 };
 
+const SPRITES = {
+  Knight: "/sprites/knight.png",
+  Ranger: "/sprites/ranger.png",
+  Doctor: "/sprites/doctor.png",
+  Scout: "/sprites/scout.png",
+  Mercenary: "/sprites/mercenary.png",
+  Bannerman: "/sprites/bannerman.png",
+  Ronin: "/sprites/ronin.png",
+  Goblin: "/sprites/goblin.png",
+  "First Boss": "/sprites/boss.png"
+};
+
 function App() {
   const [page, setPage] = useState("dashboard");
   const [mode, setMode] = useState("login");
 
-  const [email, setEmail] = useState("new@test.com");
-  const [password, setPassword] = useState("123456");
-  const [leetcodeUsername, setLeetcodeUsername] = useState("edlee1");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [leetcodeUsername, setLeetcodeUsername] = useState("");
   const [message, setMessage] = useState("");
 
   const [inventory, setInventory] = useState(null);
@@ -142,6 +154,8 @@ function App() {
 
   const [endRunResult, setEndRunResult] = useState(null);
   const [battleMessage, setBattleMessage] = useState("");
+
+const [unitAnimations, setUnitAnimations] = useState({});
 
   const token = localStorage.getItem("token");
 
@@ -258,22 +272,54 @@ function App() {
     }
   }
 
-  async function takeAction(skillNumber, targetPosition) {
-    const { data } = await apiRequest("/runs/action", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        skillNumber,
-        targetPosition
-      })
-    });
+async function takeAction(skillNumber, targetPosition) {
+  const skill = getCurrentSkills().find(
+    skill => skill.number === skillNumber
+  );
 
-    if (data.run) {
-      setRun(data.run);
+  if (skill?.target === "enemy") {
+    const target = run?.enemies?.find(
+      enemy => enemy.position === Number(targetPosition)
+    );
+
+    if (target) {
+      triggerAnimation(target._id, "hit");
     }
-
-    setBattleMessage(data.message || data.error || data.message);
   }
+
+  if (skill?.target === "ally") {
+    const target = run?.party?.find(
+      ally => ally.position === Number(targetPosition)
+    );
+
+    if (target) {
+      triggerAnimation(target._id, "boost");
+    }
+  }
+
+  if (skill?.target === "self" || skill?.target === "none") {
+    const currentUnit = getCurrentUnit();
+
+    if (currentUnit) {
+      triggerAnimation(currentUnit._id, "boost");
+    }
+  }
+
+  const { data } = await apiRequest("/runs/action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      skillNumber,
+      targetPosition
+    })
+  });
+
+  if (data.run) {
+    setRun(data.run);
+  }
+
+  setBattleMessage(data.message || data.error || "Action resolved");
+}
 
   async function claimReward() {
     const { data } = await apiRequest("/runs/reward", {
@@ -360,6 +406,23 @@ async function endRun() {
       setSelectedTargetPosition(1);
     }
   }
+
+function triggerAnimation(unitId, type) {
+  console.log("ANIMATION TRIGGERED", unitId, type);
+
+  setUnitAnimations(prev => ({
+    ...prev,
+    [unitId]: type
+  }));
+
+  setTimeout(() => {
+    setUnitAnimations(prev => {
+      const copy = { ...prev };
+      delete copy[unitId];
+      return copy;
+    });
+  }, 900);
+}
 
   async function useSelectedSkill() {
     const skill = getCurrentSkills().find(s => s.number === selectedSkill);
@@ -547,9 +610,22 @@ async function endRun() {
                         )
                       }
                     >
-                      <h3>{character.name}</h3>
-                      <span>{character.rarity}</span>
-                      <p>{character.classType}</p>
+<img
+  src={SPRITES[character.name]}
+  alt={character.name}
+  style={{
+    width: "96px",
+    height: "96px",
+    objectFit: "contain",
+    imageRendering: "pixelated",
+    display: "block",
+    margin: "0 auto 10px"
+  }}
+/>
+
+<h3>{character.name}</h3>
+<span>{character.rarity}</span>
+<p>{character.classType}</p>
                     </div>
 
                     <label className="checkbox-line">
@@ -691,9 +767,23 @@ async function endRun() {
                       {run.party?.map(unit => (
                         <div
                           key={unit._id}
-                          className={`unit-card ${unit.alive ? "" : "dead"}`}
+className={`unit-card ${unit.alive ? "" : "dead"} ${
+  unitAnimations[unit._id] || ""
+}`}
                         >
                           <span className="position">P{unit.position}</span>
+<img
+  src={SPRITES[unit.name]}
+  alt={unit.name}
+  style={{
+    width: "72px",
+    height: "72px",
+    objectFit: "contain",
+    imageRendering: "pixelated",
+    display: "block",
+    margin: "0 auto 8px"
+  }}
+/>
                           <h3>{unit.name}</h3>
                           <p>{unit.hp}/{unit.maxHp} HP</p>
                           <p>SPD {unit.spd}</p>
@@ -709,9 +799,23 @@ async function endRun() {
                       {run.enemies?.map(unit => (
                         <div
                           key={unit._id}
-                          className={`unit-card enemy ${unit.alive ? "" : "dead"}`}
+className={`unit-card enemy ${unit.alive ? "" : "dead"} ${
+  unitAnimations[unit._id] || ""
+}`}
                         >
                           <span className="position">E{unit.position}</span>
+<img
+  src={SPRITES[unit.name]}
+  alt={unit.name}
+  style={{
+    width: "72px",
+    height: "72px",
+    objectFit: "contain",
+    imageRendering: "pixelated",
+    display: "block",
+    margin: "0 auto 8px"
+  }}
+/>
                           <h3>{unit.name}</h3>
                           <p>{unit.hp}/{unit.maxHp} HP</p>
                           <p>SPD {unit.spd}</p>
